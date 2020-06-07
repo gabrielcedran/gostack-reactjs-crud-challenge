@@ -1,5 +1,5 @@
 import React, { useRef, useCallback } from 'react';
-
+import * as Yup from 'yup';
 import { FiCheckSquare } from 'react-icons/fi';
 import { FormHandles } from '@unform/core';
 import { Form } from './styles';
@@ -37,7 +37,19 @@ const ModalAddFood: React.FC<IModalProps> = ({
 
   const handleSubmit = useCallback(
     async (data: ICreateFoodData) => {
-      // TODO ADD A NEW FOOD AND CLOSE THE MODAL
+      const schema = Yup.object().shape({
+        image: Yup.string().required().url(),
+        name: Yup.string().required().min(3),
+        price: Yup.number().required().min(0),
+        description: Yup.string().required(),
+      });
+      try {
+        await schema.validate(data, { abortEarly: false });
+        handleAddFood(data);
+        setIsOpen();
+      } catch (error) {
+        console.log(error);
+      }
     },
     [handleAddFood, setIsOpen],
   );
